@@ -493,10 +493,14 @@ function formatPeriod(date: Date | string | null | undefined): string {
   break-inside: avoid;
 }
 
-/* Company, position and dates share one row and are evenly spread so the
-   row itself reads as a divider between entries. */
+/* Company, position and dates share one row. The position stays centred — its
+   column is sized to its own content and flanked by two equal spare columns —
+   but the company column may now grow into whatever the position does not need.
+   With three equal thirds the company was pinned to 1/3 and wrapped even when
+   the row still had plenty of room to its right. */
 .classic__entry-head {
-  @apply grid grid-cols-3 items-center gap-x-3;
+  @apply grid items-center gap-x-3;
+  grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
 
   &--split {
     @apply flex flex-wrap items-baseline gap-x-2;
