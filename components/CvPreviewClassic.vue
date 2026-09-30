@@ -193,11 +193,13 @@ function formatPeriod(date: Date | string | null | undefined): string {
               :src="job.logoDataUri"
               alt=""
             >
-            <span v-if="job.organization">{{ job.organization }}</span>
-            <span
-              v-if="job.location"
-              class="classic__org-location"
-            >({{ job.location }})</span>
+            <span class="classic__company-text">
+              <span v-if="job.organization">{{ job.organization }}</span>
+              <span
+                v-if="job.location"
+                class="classic__org-location"
+              >({{ job.location }})</span>
+            </span>
           </span>
           <h4 class="classic__entry-title">
             {{ job.title }}
@@ -337,11 +339,13 @@ function formatPeriod(date: Date | string | null | undefined): string {
               :src="edu.logoDataUri"
               alt=""
             >
-            <span v-if="edu.organization">{{ edu.organization }}</span>
-            <span
-              v-if="edu.location"
-              class="classic__org-location"
-            >({{ edu.location }})</span>
+            <span class="classic__company-text">
+              <span v-if="edu.organization">{{ edu.organization }}</span>
+              <span
+                v-if="edu.location"
+                class="classic__org-location"
+              >({{ edu.location }})</span>
+            </span>
           </span>
           <h4 class="classic__entry-title">
             {{ edu.title }}<span
@@ -509,20 +513,23 @@ function formatPeriod(date: Date | string | null | undefined): string {
   text-align: left;
 }
 
-/* Company name and place read as one line of text. A flex row (with a nowrap
-   place) pushed the place to the far edge of the column as soon as the company
-   name wrapped onto several lines — leaving a gap between the two. As plain
-   inline text the place always stays glued to the last word of the name. */
+/* Flex (not the previous plain inline text) so the logo centres on real box
+   geometry: with `vertical-align: middle` a logo taller than the 0.86rem line
+   aligned to the baseline + x-height instead of the middle of the glyphs and
+   visibly hung below the text. The name + place stay wrapped in
+   `.classic__company-text` though: as two separate flex items a wrapping name
+   pushed the place to the far edge of the column, leaving a gap. Keeping them
+   as inline text inside that wrapper keeps the place glued to the name. */
 .classic__company {
   font-size: 0.86rem;
   line-height: 1.35;
-  @apply font-bold text-slate-900;
+  @apply flex items-center font-bold text-slate-900;
 }
 
 .classic__company-logo {
-  @apply inline-block align-middle rounded object-contain;
-  width: 1rem;
-  height: 1rem;
+  @apply flex-shrink-0 rounded object-contain;
+  width: 1.15rem;
+  height: 1.15rem;
   margin-right: 0.375rem;
 }
 
