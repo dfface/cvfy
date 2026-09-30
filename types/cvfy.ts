@@ -56,6 +56,13 @@ export interface Cv {
   fontFamily?: CvFontId
   /** Rendering order of the sections. Missing ids are appended automatically. */
   sectionOrder?: CvSectionId[]
+  /**
+   * Custom section headings. Keyed by the i18n key of the default heading
+   * (e.g. "experience", "education", "projects", "skills", "social",
+   * "languages", "about-me", "contact"). An empty/omitted key falls back to
+   * the localized default.
+   */
+  sectionTitles?: Record<string, string>
 }
 /**
  * A user defined skill group: an editable label plus a list of skills.

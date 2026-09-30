@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { SectionNameList } from '~/types/cvfy'
 import { useCvState } from '~/data/useCvState'
+import { useSectionTitle } from '~/composables/useSectionTitle'
 import { cvTemplates } from '~/data/cv-templates'
 import { cvFonts } from '~/data/cv-fonts'
 
@@ -11,6 +12,25 @@ const {
   resetForm,
   addSkillGroup,
 } = useCvState()
+
+const sectionTitleKeys = [
+  'experience',
+  'education',
+  'projects',
+  'skills',
+  'social',
+  'languages',
+  'about-me',
+  'contact',
+]
+
+// Ensure the overrides object exists so the v-model bindings below are safe
+// even when loading a settings JSON saved before this field existed.
+if (!formSettings.value.sectionTitles) {
+  formSettings.value.sectionTitles = {}
+}
+
+const sectionTitle = useSectionTitle()
 const switchLocalePath = useSwitchLocalePath()
 const i18n = useI18n()
 const { downloadPdf } = usePrint()
@@ -332,7 +352,7 @@ onMounted(() => {
                 <label
                   class="form__label"
                   for="aboutme"
-                >🌟 {{ $t("about-me") }}</label>
+                >🌟 {{ sectionTitle('about-me') }}</label>
                 <textarea
                   id="aboutme"
                   v-model="formSettings.aboutme"
@@ -353,7 +373,7 @@ onMounted(() => {
         <expansion-panel :panel-name="$t('skills')">
           <template #title>
             <legend class="form__legend">
-              {{ $t("skills") }}
+              {{ sectionTitle('skills') }}
             </legend>
           </template>
           <template #content>
@@ -381,7 +401,7 @@ onMounted(() => {
         <expansion-panel :panel-name="$t('social')">
           <template #title>
             <legend class="form__legend">
-              {{ $t("social") }}
+              {{ sectionTitle('social') }}
             </legend>
           </template>
           <template #content>
@@ -480,6 +500,39 @@ onMounted(() => {
         </expansion-panel>
       </fieldset>
       <!-- SOCIAL -->
+
+      <!-- SECTION TITLES -->
+      <fieldset class="form__section grid gap-3">
+        <expansion-panel :panel-name="$t('section-titles')">
+          <template #title>
+            <legend class="form__legend">
+              {{ $t("section-titles") }}
+            </legend>
+          </template>
+          <template #content>
+            <div class="grid gap-3">
+              <div
+                v-for="key in sectionTitleKeys"
+                :key="key"
+                class="form__group"
+              >
+                <label
+                  class="form__label"
+                  :for="`section-title-${key}`"
+                >{{ $t(key) }}</label>
+                <input
+                  :id="`section-title-${key}`"
+                  v-model="formSettings.sectionTitles[key]"
+                  class="form__control"
+                  type="text"
+                  :placeholder="$t(key)"
+                >
+              </div>
+            </div>
+          </template>
+        </expansion-panel>
+      </fieldset>
+      <!-- SECTION TITLES -->
 
       <!-- HISTORY SECTIONS -->
       <CvSettingsHistorySection

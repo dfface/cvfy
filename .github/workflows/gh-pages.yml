@@ -38,8 +38,6 @@ jobs:
       - name: Generate static site
         run: npm run generate
         env:
-          # Skip sharp-based PWA icon generation to test the munmap_chunk crash.
-          GENERATE_SKIP_PWA_ASSETS: 'true'
           # GitHub Pages serves from https://<user>.github.io/<repo>/.
           # Cloudflare Pages serves from the domain root, so set the
           # NUXT_APP_BASE_URL repository variable to "/" for that target

@@ -36,12 +36,13 @@
     "eslint": "^9.39.1",
     "postcss": "^8.5.6",
     "postcss-nested": "6.0.1",
-    "sharp": "^0.33.5",
+    "sharp": "^0.34.2",
     "sharp-ico": "^0.1.5",
     "tailwind-utopia": "github:cwsdigital/tailwind-utopia",
     "typescript": "^5.8.3"
   },
   "overrides": {
-    "estree-walker": "2.0.2"
+    "estree-walker": "2.0.2",
+    "sharp": "^0.34.2"
   }
 }

@@ -1,7 +1,9 @@
 <script lang="ts" setup>
 import { useCvState } from '~/data/useCvState'
+import { useSectionTitle } from '~/composables/useSectionTitle'
 
 const { formSettings } = useCvState()
+const sectionTitle = useSectionTitle()
 </script>
 
 <template>
@@ -10,7 +12,7 @@ const { formSettings } = useCvState()
       class="cv__section-title cv__section-title--main"
       :class="formSettings.layout === 'one-column' && 'sr-only'"
     >
-      {{ $t("about-me") }}
+      {{ sectionTitle('about-me') }}
     </h4>
     <p class="font-light">
       <!-- Avoids unnecessary spaces at the begging while still allowing break lines -->

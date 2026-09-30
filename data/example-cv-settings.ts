@@ -75,6 +75,7 @@ export const cvSettingTemplate: Cv = {
   displaySocialInHeader: false,
   displayEducation: true,
   displayProjects: true,
+  sectionTitles: {},
   displayJobSkills: true,
   displaySoftSkills: true,
   displayLanguages: true,
@@ -107,5 +108,6 @@ export const cvSettingsEmptyTemplate: Cv = {
   displaySocialInHeader: false,
   displayEducation: true,
   displayProjects: false,
+  sectionTitles: {},
   activeColor: '#5B21B6',
 }

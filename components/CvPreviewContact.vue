@@ -1,7 +1,9 @@
 <script lang="ts" setup>
 import { useCvState } from '~/data/useCvState'
+import { useSectionTitle } from '~/composables/useSectionTitle'
 
 const { formSettings } = useCvState()
+const sectionTitle = useSectionTitle()
 
 const emailHref = computed(() => {
   return `mailto:${formSettings.value.email}`
@@ -20,7 +22,7 @@ const phoneNumberHref = computed(() => {
       class="cv__section-title"
       :class="[{ 'sr-only': formSettings.layout === 'one-column' }]"
     >
-      {{ $t("contact") }}
+      {{ sectionTitle('contact') }}
     </h4>
     <div
       class="flex"

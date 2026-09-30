@@ -1,7 +1,9 @@
 <script lang="ts" setup>
 import { useCvState } from '~/data/useCvState'
+import { useSectionTitle } from '~/composables/useSectionTitle'
 
 const { formSettings } = useCvState()
+const sectionTitle = useSectionTitle()
 
 const skillGroups = computed(() =>
   (formSettings.value.skillGroups ?? []).filter(
@@ -19,7 +21,7 @@ const skillGroups = computed(() =>
       class="cv__section-title"
       :class="formSettings.layout === 'one-column' ? 'cv__section-title--main' : 'sr-only'"
     >
-      {{ $t("skills") }}
+      {{ sectionTitle('skills') }}
     </h4>
     <CvPreviewSkill
       v-for="group in skillGroups"

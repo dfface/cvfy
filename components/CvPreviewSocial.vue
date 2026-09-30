@@ -1,7 +1,9 @@
 <script lang="ts" setup>
 import { useCvState } from '~/data/useCvState'
+import { useSectionTitle } from '~/composables/useSectionTitle'
 
 const { formSettings } = useCvState()
+const sectionTitle = useSectionTitle()
 </script>
 
 <template>
@@ -13,7 +15,7 @@ const { formSettings } = useCvState()
       class="cv__section-title"
       :class="formSettings.layout === 'one-column' && 'sr-only'"
     >
-      {{ $t("social") }}
+      {{ sectionTitle('social') }}
     </h4>
     <div
       class="flex"

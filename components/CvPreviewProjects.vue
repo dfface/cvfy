@@ -2,8 +2,10 @@
 import useFormatDate from '~/composables/useFormatDate'
 import { hasRichTextContent, orderEvents } from '~/utils/functions'
 import { useCvState } from '~/data/useCvState'
+import { useSectionTitle } from '~/composables/useSectionTitle'
 
 const { formSettings } = useCvState()
+const sectionTitle = useSectionTitle()
 
 const projectsSorted = computed(() => {
   return orderEvents(formSettings.value.projects)
@@ -18,7 +20,7 @@ const formatDate = useFormatDate()
     class="cv__section cv__section--main w-full"
   >
     <h4 class="cv__section-title cv__section-title--main">
-      {{ $t("projects") }}
+      {{ sectionTitle('projects') }}
     </h4>
     <ul class="cv__event">
       <li

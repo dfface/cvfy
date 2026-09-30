@@ -1,9 +1,11 @@
 <script lang="ts" setup>
 import { useCvState } from '~/data/useCvState'
 import { hasRichTextContent, orderEvents } from '~/utils/functions'
-import { DEFAULT_SECTION_ORDER, type CvEvent, type CvSectionId } from '~/types/cvfy'
+import { type CvEvent, type CvSectionId, DEFAULT_SECTION_ORDER } from '~/types/cvfy'
+import { useSectionTitle } from '~/composables/useSectionTitle'
 
 const { formSettings } = useCvState()
+const sectionTitle = useSectionTitle()
 
 /**
  * Maps each section to its position so the flex column can re-order them
@@ -175,7 +177,7 @@ function formatPeriod(date: Date | string | null | undefined): string {
     :style="{ order: sectionOrderMap.work ?? 99 }"
   >
     <h3 class="classic__section-title">
-      {{ $t("experience") }}
+      {{ sectionTitle('experience') }}
     </h3>
     <ul class="classic__entries">
       <li
@@ -258,7 +260,7 @@ function formatPeriod(date: Date | string | null | undefined): string {
     :style="{ order: sectionOrderMap.projects ?? 99 }"
   >
     <h3 class="classic__section-title">
-      {{ $t("projects") }}
+      {{ sectionTitle('projects') }}
     </h3>
     <ul class="classic__entries">
       <li
@@ -299,7 +301,7 @@ function formatPeriod(date: Date | string | null | undefined): string {
     :style="{ order: sectionOrderMap.skills ?? 99 }"
   >
     <h3 class="classic__section-title">
-      {{ $t("skills") }}
+      {{ sectionTitle('skills') }}
     </h3>
     <p class="classic__skills-inline">
       <span
@@ -319,7 +321,7 @@ function formatPeriod(date: Date | string | null | undefined): string {
     :style="{ order: sectionOrderMap.education ?? 99 }"
   >
     <h3 class="classic__section-title">
-      {{ $t("education") }}
+      {{ sectionTitle('education') }}
     </h3>
     <ul class="classic__entries">
       <li
@@ -373,7 +375,7 @@ function formatPeriod(date: Date | string | null | undefined): string {
     :style="{ order: sectionOrderMap.social ?? 99 }"
   >
     <h3 class="classic__section-title">
-      {{ $t("social") }}
+      {{ sectionTitle('social') }}
     </h3>
     <ul class="classic__contacts">
       <li
