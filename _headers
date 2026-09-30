@@ -1,0 +1,20 @@
+# Cloudflare Pages custom headers.
+# https://developers.cloudflare.com/pages/platform/headers/
+# Other hosts simply serve this file as a static asset (harmless).
+
+# Hashed build assets never change: cache them for a year.
+/_nuxt/*
+  Cache-Control: public, max-age=31536000, immutable
+
+# The service worker must always be revalidated so updates reach users.
+/sw.js
+  Cache-Control: public, max-age=0, must-revalidate
+
+# HTML references the new asset hashes on every deploy, so never cache it long.
+/*.html
+  Cache-Control: public, max-age=0, must-revalidate
+
+/*
+  X-Content-Type-Options: nosniff
+  X-Frame-Options: SAMEORIGIN
+  Referrer-Policy: strict-origin-when-cross-origin

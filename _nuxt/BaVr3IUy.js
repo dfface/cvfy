@@ -1,0 +1,1 @@
+import{a5 as e,a6 as a,a7 as r,a8 as s,a9 as c,aa as o,ab as u,ac as l,ad as $,ae as n}from"./WrnHCuEC.js";const t=()=>({legacy:!1,fallbackLocale:"en",locale:"en",messages:{ar:n,de:$,en:l,es:u,fr:o,id:c,pt:s,zh:r,az:a,nl:e}});export{t as default};
