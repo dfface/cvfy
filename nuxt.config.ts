@@ -168,7 +168,10 @@ export default defineNuxtConfig({
       enabled: false,
     },
     registerType: 'autoUpdate',
-    pwaAssets: {
+    // Diagnostic gate: set GENERATE_SKIP_PWA_ASSETS=true to skip the sharp-based
+    // PWA icon generation during `nuxi generate` (sharp is the prime suspect
+    // behind the `munmap_chunk(): invalid pointer` CI crash after prerender).
+    pwaAssets: process.env.GENERATE_SKIP_PWA_ASSETS ? false : {
       config: true,
     },
     manifest: {
