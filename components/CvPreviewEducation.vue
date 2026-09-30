@@ -1,6 +1,6 @@
 <script lang="ts" setup>
 import useFormatDate from '~/composables/useFormatDate'
-import { orderEvents } from '~/utils/functions'
+import { hasRichTextContent, orderEvents } from '~/utils/functions'
 import { useCvState } from '~/data/useCvState'
 
 const { formSettings } = useCvState()
@@ -30,9 +30,12 @@ const educationSorted = computed(() => {
           :class="[edu.displayDate ? 'grid grid-cols-3' : 'flex justify-between']"
         >
           <h5 class="cv__section-title cv__section-title--sm">
-            {{ edu.title }}
+            {{ edu.title }}<span
+              v-if="edu.degree"
+              class="font-normal text-slate-600"
+            >, {{ edu.degree }}</span>
           </h5>
-          <span class="justify-self-center">{{ edu.location }}</span>
+          <span class="justify-self-center">{{ edu.organization }}</span>
           <span
             v-if="edu.displayDate"
             class="justify-self-end flex-shrink-0"
@@ -44,7 +47,14 @@ const educationSorted = computed(() => {
             <template v-else>{{ formatDate(edu.to) }}</template>
           </span>
         </div>
+        <p
+          v-if="edu.honors?.length"
+          class="font-light"
+        >
+          {{ edu.honors.join(" ｜ ") }}
+        </p>
         <CvTextEditor
+          v-if="hasRichTextContent(edu.summary)"
           v-model="edu.summary"
           :read-only="true"
           class="cv__desc"

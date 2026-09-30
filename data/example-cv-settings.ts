@@ -1,7 +1,7 @@
 import { type Cv, LEVELS } from '~/types/cvfy'
 
 export const cvSettingTemplate: Cv = {
-  layout: 'two-column',
+  layout: 'classic',
   profileImageDataUri: '/knope_campaign_rect.webp',
   jobTitle: 'Deputy Director of Parks and Recreations',
   name: 'Leslie',
@@ -22,11 +22,14 @@ export const cvSettingTemplate: Cv = {
   education: [
     {
       id: '1',
+      organization: 'Indiana University',
       title: 'Environmental and Public Affairs',
-      location: 'Indiana University',
+      degree: 'Master of Public Administration',
+      location: 'Bloomington, Indiana',
       from: new Date(1993, 9, 1),
       to: new Date(1993, 4, 1),
       current: false,
+      honors: ["Dean's List", 'Best Thesis Award'],
       summary:
         '<ul><li><p>Sed ut lorem viverra urna malesuada interdum in ut risus.</p></li><li><p>Duis at sem non justo aliquam iaculis.</p></li><li><p>Quisque lobortis nibh non turpis interdum ornare.</p></li><li><p>Sed et diam nec arcu tempor suscipit sit amet at tellus.</p></li><li><p>Duis quis diam imperdiet, pharetra lacus eget, fringilla odio.</p></li></ul>',
     },
@@ -34,6 +37,7 @@ export const cvSettingTemplate: Cv = {
   work: [
     {
       id: '1',
+      organization: 'Parks and Recreation Department',
       title: 'Deputy Director of Parks',
       location: 'Pawnee, Indiana',
       from: new Date(2009, 1, 1),
@@ -44,6 +48,7 @@ export const cvSettingTemplate: Cv = {
     },
     {
       id: '2',
+      organization: 'City Council',
       title: 'City Councilor',
       location: 'Pawnee, Indiana',
       from: new Date(2012, 1, 1),
@@ -61,11 +66,13 @@ export const cvSettingTemplate: Cv = {
       from: new Date(2009, 1, 1),
       to: new Date(2012, 1, 1),
       current: true,
+      parentId: '1',
       summary:
         '<ul><li><p>Sed ut lorem viverra urna malesuada interdum in ut risus.</p></li><li><p>Duis at sem non justo aliquam iaculis.</p></li><li><p>Quisque lobortis nibh non turpis interdum ornare.</p></li><li><p>Sed et diam nec arcu tempor suscipit sit amet at tellus.</p></li><li><p>Duis quis diam imperdiet, pharetra lacus eget, fringilla odio.</p></li></ul>',
     },
   ],
   displaySocial: true,
+  displaySocialInHeader: false,
   displayEducation: true,
   displayProjects: true,
   displayJobSkills: true,
@@ -76,7 +83,7 @@ export const cvSettingTemplate: Cv = {
 }
 
 export const cvSettingsEmptyTemplate: Cv = {
-  layout: 'two-column',
+  layout: 'classic',
   profileImageDataUri: null,
   jobTitle: '',
   name: '',
@@ -97,6 +104,7 @@ export const cvSettingsEmptyTemplate: Cv = {
   work: [],
   projects: [],
   displaySocial: true,
+  displaySocialInHeader: false,
   displayEducation: true,
   displayProjects: false,
   activeColor: '#5B21B6',

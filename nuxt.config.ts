@@ -1,15 +1,23 @@
 import { defineNuxtConfig } from 'nuxt/config'
 import en from './i18n/locales/en.json'
 
+/**
+ * Every locale gets a pre-rendered page so a static host (GitHub Pages) can
+ * serve /<locale>/create directly instead of returning a 404.
+ */
+const LOCALE_CODES = ['en', 'es', 'id', 'de', 'fr', 'ar', 'zh', 'pt', 'az', 'nl']
+
 export default defineNuxtConfig({
   devtools: { enabled: false },
 
   site: {
     url:
       // eslint-disable-next-line node/prefer-global/process
-      process.env.NODE_ENV === 'dev'
+      process.env.NUXT_SITE_URL
+      // eslint-disable-next-line node/prefer-global/process
+      || (process.env.NODE_ENV === 'dev'
         ? 'http://localhost:3000'
-        : 'https://www.cvfy.xyz',
+        : 'https://www.cvfy.xyz'),
   },
 
   imports: {
@@ -17,6 +25,12 @@ export default defineNuxtConfig({
   },
 
   app: {
+    // Set through NUXT_APP_BASE_URL when deploying to a sub path (e.g. GitHub
+    // Pages serves from /<repo>/). Defaults to the domain root.
+    baseURL:
+      // eslint-disable-next-line node/prefer-global/process
+      process.env.NUXT_APP_BASE_URL || '/',
+
     // Global page headers (https://go.nuxtjs.dev/config-head)
     head: {
       meta: [
@@ -47,6 +61,13 @@ export default defineNuxtConfig({
   // Build Configuration (https://go.nuxtjs.dev/config-build)
   build: {},
 
+  // Static generation (https://go.nuxtjs.dev/config-nitro)
+  nitro: {
+    prerender: {
+      routes: ['/create', ...LOCALE_CODES.map(code => `/${code}/create`)],
+    },
+  },
+
   postcss: {
     // Add plugin names as key and arguments as value
     // Install them before as dependencies with npm or yarn
@@ -59,6 +80,14 @@ export default defineNuxtConfig({
     defaults: {
       weights: [300, 400, 700],
     },
+    // Chinese webfonts, self-hosted at build time. They are much heavier than
+    // the Latin system stacks above (several MB per family), so only add
+    // families that are actually offered in the font picker.
+    families: [
+      { name: 'Noto Sans SC', weights: [400, 700] },
+      { name: 'Noto Serif SC', weights: [400, 700] },
+      { name: 'ZCOOL XiaoWei', weights: [400] },
+    ],
   },
 
   i18n: {

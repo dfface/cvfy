@@ -6,7 +6,16 @@ const { sectionName, entries = [] } = defineProps<{
   sectionName: SectionName
   entries: CvEvent[]
 }>()
-const { addEntry, removeEntry } = useCvState()
+const { formSettings, addEntry, removeEntry } = useCvState()
+
+/**
+ * Display name of an entry: the organization (company / school) when set,
+ * otherwise the title (position, major or project name).
+ */
+function entryName(entry: CvEvent): string {
+  return entry.organization?.trim() || entry.title?.trim() || ''
+}
+
 function focusEditor(id: string) {
   const editorElem = document.getElementById(`${id}-editor`)
   if (editorElem)
@@ -32,19 +41,19 @@ function focusEditor(id: string) {
         :key="entry.id"
       >
         <expansion-panel
-          :panel-name="`${entry.title}`"
+          :panel-name="entryName(entry)"
           class="mb-3"
         >
           <template #title>
             <h3 class="form__legend form__legend--small dynamic-section__title">
               <span>
-                {{ entry.title }}
+                {{ entryName(entry) }}
               </span>
             </h3>
           </template>
           <template #action-button>
             <button
-              :aria-label="`Remove ${entry.title} ${$t(sectionName)} from CV`"
+              :aria-label="`Remove ${entryName(entry)} ${$t(sectionName)} from CV`"
               type="button"
               class="form__btn form__btn--delete mr-3"
               @click.stop="removeEntry({ sectionName, entry })"
@@ -56,15 +65,32 @@ function focusEditor(id: string) {
           </template>
           <template #content>
             <div class="dynamic-section">
+              <div
+                v-if="sectionName !== 'projects'"
+                class="form__group col-span-full"
+              >
+                <label
+                  class="form__label"
+                  :for="`entryOrganization-${entry.id}`"
+                >
+                  <template v-if="sectionName === 'education'">🏫 {{ $t("school") }}</template>
+                  <template v-else>🏢 {{ $t("company") }}</template>
+                </label>
+                <input
+                  :id="`entryOrganization-${entry.id}`"
+                  v-model="entry.organization"
+                  class="form__control"
+                  type="text"
+                >
+              </div>
               <div class="form__group col-span-full">
                 <label
                   class="form__label"
                   :for="`entryTitle--${entry.id}`"
                 >
-                  <template v-if="sectionName === 'education'">🎓</template>
-                  <template v-else-if="sectionName === 'projects'">✨</template>
-                  <template v-else>💼</template>
-                  {{ $t("title") }}
+                  <template v-if="sectionName === 'education'">🎓 {{ $t("major") }}</template>
+                  <template v-else-if="sectionName === 'projects'">✨ {{ $t("title") }}</template>
+                  <template v-else>💼 {{ $t("title") }}</template>
                 </label>
                 <input
                   :id="`entryTitle--${entry.id}`"
@@ -72,6 +98,65 @@ function focusEditor(id: string) {
                   class="form__control"
                   type="text"
                 >
+              </div>
+              <div
+                v-if="sectionName === 'education'"
+                class="form__group col-span-full"
+              >
+                <label
+                  class="form__label"
+                  :for="`entryDegree-${entry.id}`"
+                >
+                  🎓 {{ $t("degree") }}
+                </label>
+                <input
+                  :id="`entryDegree-${entry.id}`"
+                  v-model="entry.degree"
+                  class="form__control"
+                  type="text"
+                >
+              </div>
+              <div
+                v-if="sectionName !== 'projects'"
+                class="form__group col-span-full"
+              >
+                <span class="form__label">
+                  <template v-if="sectionName === 'education'">🎓</template>
+                  <template v-else>🏢</template>
+                  {{ $t("logo") }}
+                </span>
+                <CvImageUploader
+                  v-model="entry.logoDataUri"
+                  :label="$t('upload-logo')"
+                />
+              </div>
+              <div
+                v-if="sectionName === 'projects'"
+                class="form__group col-span-full"
+              >
+                <label
+                  class="form__label"
+                  :for="`entryParent-${entry.id}`"
+                >🏢 {{ $t("belongs-to") }}</label>
+                <select
+                  :id="`entryParent-${entry.id}`"
+                  v-model="entry.parentId"
+                  class="form__control"
+                >
+                  <option :value="undefined">
+                    {{ $t("auto-parent") }}
+                  </option>
+                  <option :value="null">
+                    {{ $t("no-parent") }}
+                  </option>
+                  <option
+                    v-for="job in formSettings.work"
+                    :key="job.id"
+                    :value="job.id"
+                  >
+                    {{ entryName(job) }}<template v-if="job.location"> · {{ job.location }}</template>
+                  </option>
+                </select>
               </div>
               <div class="form__group col-span-full">
                 <label
@@ -91,6 +176,16 @@ function focusEditor(id: string) {
                   class="form__control"
                   type="text"
                 >
+              </div>
+              <div
+                v-if="sectionName === 'education'"
+                class="form__group col-span-full"
+              >
+                <span class="form__label">🏅 {{ $t("honors") }}</span>
+                <CvTagsInput
+                  v-model="entry.honors"
+                  :label="$t('honors')"
+                />
               </div>
               <div class="form__group col-span-full">
                 <div class="form__label flex justify-between">

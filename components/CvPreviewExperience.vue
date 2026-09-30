@@ -1,6 +1,6 @@
 <script lang="ts" setup>
 import useFormatDate from '~/composables/useFormatDate'
-import { orderEvents } from '~/utils/functions'
+import { hasRichTextContent, orderEvents } from '~/utils/functions'
 import { useCvState } from '~/data/useCvState'
 
 const { formSettings } = useCvState()
@@ -26,7 +26,7 @@ const workSorted = computed(() => {
           <h5 class="cv__section-title cv__section-title--sm">
             {{ job.title }}
           </h5>
-          <span class="justify-self-center">{{ job.location }}</span>
+          <span class="justify-self-center">{{ job.organization }}</span>
           <span class="justify-self-end">
             {{ formatDate(job.from) }} –
             <template v-if="job.current">
@@ -38,6 +38,7 @@ const workSorted = computed(() => {
           </span>
         </div>
         <CvTextEditor
+          v-if="hasRichTextContent(job.summary)"
           v-model="job.summary"
           :read-only="true"
           class="cv__desc"

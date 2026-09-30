@@ -1,6 +1,6 @@
 <script lang="ts" setup>
 import useFormatDate from '~/composables/useFormatDate'
-import { orderEvents } from '~/utils/functions'
+import { hasRichTextContent, orderEvents } from '~/utils/functions'
 import { useCvState } from '~/data/useCvState'
 
 const { formSettings } = useCvState()
@@ -52,6 +52,7 @@ const formatDate = useFormatDate()
           :href="project.location"
         />
         <CvTextEditor
+          v-if="hasRichTextContent(project.summary)"
           v-model="project.summary"
           :read-only="true"
           class="cv__desc"

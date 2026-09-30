@@ -6,11 +6,22 @@ import {
 import {
   type Cv,
   type CvEvent,
+  type CvSectionId,
   type DefaultSkill,
   type LanguagesSkill,
   type SectionName,
+  type SkillGroup,
+  DEFAULT_SECTION_ORDER,
   SectionNameList,
+  CV_FONTS,
 } from '~/types/cvfy'
+
+/** Fresh, empty skill groups used when a CV has no skills at all. */
+function createEmptySkillGroups(): SkillGroup[] {
+  return [
+    { id: crypto.randomUUID(), label: '', values: [], display: true },
+  ]
+}
 
 const state = reactive({
   formSettings: { ...cvSettingsEmptyTemplate } as Cv,
@@ -33,11 +44,84 @@ export function useCvState() {
     else {
       const cvSettingsObj = JSON.parse(cvSettings)
       state.formSettings = { ...cvSettingsEmptyTemplate, ...cvSettingsObj }
-      patchId(state.formSettings)
-      patchDisplayDate(state.formSettings)
     }
+    prepareSettings(state.formSettings)
     localStorage.setItem(locale, JSON.stringify(state.formSettings))
     state.isLoading = false
+  }
+
+  /** Applies the one-off migrations needed by older stored CVs. */
+  function prepareSettings(formSettings: Cv): void {
+    patchId(formSettings)
+    patchDisplayDate(formSettings)
+    patchOrganization(formSettings)
+    patchFontFamily(formSettings)
+    patchSectionOrder(formSettings)
+    migrateSkillGroups(formSettings)
+  }
+
+  /** Falls back to the default font when unset or unknown. */
+  function patchFontFamily(formSettings: Cv): void {
+    if (!formSettings.fontFamily || !CV_FONTS.includes(formSettings.fontFamily))
+      formSettings.fontFamily = 'default'
+  }
+
+  /** Keeps the section order valid: stored order first, missing ids appended. */
+  function patchSectionOrder(formSettings: Cv): void {
+    const stored = (formSettings.sectionOrder ?? []).filter(id =>
+      DEFAULT_SECTION_ORDER.includes(id),
+    )
+    formSettings.sectionOrder = [
+      ...new Set<CvSectionId>([...stored, ...DEFAULT_SECTION_ORDER]),
+    ]
+  }
+
+  /**
+   * Work and education entries used to keep the company / school in the
+   * `location` field. Move it to the dedicated `organization` field and let
+   * `location` mean the actual place again. Projects store a link in
+   * `location`, so they are left untouched.
+   */
+  function patchOrganization(formSettings: Cv): void {
+    for (const section of ['work', 'education'] as const) {
+      for (const entry of formSettings[section]) {
+        if (!entry.organization && entry.location) {
+          entry.organization = entry.location
+          entry.location = ''
+        }
+      }
+    }
+  }
+
+  /**
+   * Older CVs stored skills in four hard-coded fields. When no `skillGroups`
+   * exist yet, convert them into editable groups (translated once).
+   */
+  function migrateSkillGroups(formSettings: Cv): void {
+    if (formSettings.skillGroups && formSettings.skillGroups.length > 0)
+      return
+
+    const legacy = [
+      { labelKey: 'technical-skills', display: formSettings.displayJobSkills, values: formSettings.jobSkills },
+      { labelKey: 'soft-skills', display: formSettings.displaySoftSkills, values: formSettings.softSkills },
+      {
+        labelKey: 'languages',
+        display: formSettings.displayLanguages,
+        values: (formSettings.languages ?? []).map(lang => `${lang.lang}(${i18n.t(lang.level)})`),
+      },
+      { labelKey: 'interests', display: formSettings.displayInterests, values: formSettings.interests },
+    ]
+
+    const groups: SkillGroup[] = legacy
+      .filter(item => (item.values?.length ?? 0) > 0)
+      .map(item => ({
+        id: crypto.randomUUID(),
+        label: i18n.t(item.labelKey),
+        values: [...item.values],
+        display: item.display !== false,
+      }))
+
+    formSettings.skillGroups = groups.length > 0 ? groups : createEmptySkillGroups()
   }
 
   function addSkill<T extends LanguagesSkill | DefaultSkill>(e: T): void {
@@ -90,6 +174,7 @@ export function useCvState() {
       to: new Date(),
       current: false,
       summary: '',
+      degree: '',
       displayDate: e.sectionName !== 'education',
     })
   }
@@ -108,8 +193,7 @@ export function useCvState() {
         ...cvSettingsEmptyTemplate,
         ...data.formSettings,
       }
-      patchId(state.formSettings)
-      patchDisplayDate(state.formSettings)
+      prepareSettings(state.formSettings)
     }
     fr.readAsText(e.target.files[0])
   }
@@ -118,6 +202,7 @@ export function useCvState() {
     state.formSettings = {
       ...cvSettingTemplate,
     }
+    prepareSettings(state.formSettings)
     localStorage.setItem(
       `cvSettings-${i18n.locale.value}`,
       JSON.stringify(state.formSettings),
@@ -125,8 +210,22 @@ export function useCvState() {
   }
 
   function clearForm(): void {
-    state.formSettings = cvSettingsEmptyTemplate
+    state.formSettings = { ...cvSettingsEmptyTemplate }
+    prepareSettings(state.formSettings)
     localStorage.removeItem(`cvSettings-${i18n.locale.value}`)
+  }
+
+  function addSkillGroup(): void {
+    state.formSettings.skillGroups = [
+      ...(state.formSettings.skillGroups ?? []),
+      { id: crypto.randomUUID(), label: '', values: [], display: true },
+    ]
+  }
+
+  function removeSkillGroup(id: string): void {
+    state.formSettings.skillGroups = (state.formSettings.skillGroups ?? []).filter(
+      group => group.id !== id,
+    )
   }
 
   function changeDisplaySection(e: {
@@ -179,5 +278,7 @@ export function useCvState() {
     resetForm,
     clearForm,
     changeDisplaySection,
+    addSkillGroup,
+    removeSkillGroup,
   }
 }

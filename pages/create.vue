@@ -20,11 +20,6 @@ useHead({
   title: t('title-tag'),
   link: [
     {
-      rel: 'preload',
-      as: 'image',
-      href: 'https://cdn.ko-fi.com/cdn/kofi5.png?v=3',
-    },
-    {
       rel: 'canonical',
       href,
     },

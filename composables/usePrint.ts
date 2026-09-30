@@ -10,11 +10,12 @@ export default function usePrint() {
     docTitle.value = document.title
 
     addEventListener('beforeprint', () => {
-      if (formSettings.value.layout === 'one-column') {
-        printMargin('0.45in')
+      // The two-column template bleeds to the page edges, the others keep a margin.
+      if (formSettings.value.layout === 'two-column') {
+        printMargin('0in')
       }
       else {
-        printMargin('0in')
+        printMargin('0.45in')
       }
     })
 
@@ -35,7 +36,8 @@ export default function usePrint() {
     const style = document.createElement('style')
     document.head.appendChild(style)
     return function (value: string) {
-      style.innerHTML = `@page {${property}: ${value}}`
+      // The page is designed for A4 (21cm wide), so pin the paper size too.
+      style.innerHTML = `@page {size: A4;${property}: ${value}}`
     }
   }
 

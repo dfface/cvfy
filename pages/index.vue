@@ -43,18 +43,6 @@ definePageMeta({
       </LandingLink>
     </div>
     <LandingHeroImage />
-    <div class="text-xs font-light">
-      Made with ♥️ by
-      <LandingLink
-        class="underline"
-        to="https://github.com/claudiabdm"
-        external
-      >
-        <span class="text-violet-800">
-          claudiabdm
-        </span>
-      </LandingLink>
-    </div>
   </section>
 </template>
 

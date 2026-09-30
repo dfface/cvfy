@@ -6,7 +6,7 @@ const { formSettings } = useCvState()
 
 <template>
   <section
-    v-if="formSettings.displaySocial"
+    v-if="formSettings.displaySocial && !formSettings.displaySocialInHeader"
     class="cv__section"
   >
     <h4
@@ -19,60 +19,7 @@ const { formSettings } = useCvState()
       class="flex"
       :class="formSettings.layout === 'one-column' ? 'flex-row flex-wrap gap-2' : 'flex-col'"
     >
-      <div
-        v-if="formSettings.linkedin"
-        class="cv__icon-wrapper"
-      >
-        <svg class="cv__icon">
-          <use href="@/assets/sprite.svg#linkedin-color" />
-        </svg>
-        <a
-          target="_blank"
-          rel="noopener"
-          :href="`https://linkedin.com/in/${formSettings.linkedin}`"
-        >{{ formSettings.linkedin }}</a>
-      </div>
-      <div
-        v-if="formSettings.twitter"
-        class="cv__icon-wrapper"
-      >
-        <svg class="cv__icon">
-          <use href="@/assets/sprite.svg#twitter-color" />
-        </svg>
-        <a
-          target="_blank"
-          rel="noopener"
-          :href="`https://twitter.com/${formSettings.twitter}`"
-        >{{ formSettings.twitter }}</a>
-      </div>
-      <div
-        v-if="formSettings.github"
-        class="cv__icon-wrapper"
-      >
-        <svg class="cv__icon">
-          <use href="@/assets/sprite.svg#github-color" />
-        </svg>
-        <a
-          target="_blank"
-          rel="noopener"
-          :href="`https://github.com/${formSettings.github}`"
-        >{{ formSettings.github }}</a>
-      </div>
-      <div
-        v-if="formSettings.website"
-        class="cv__icon-wrapper"
-      >
-        <svg class="cv__icon">
-          <use href="@/assets/sprite.svg#website" />
-        </svg>
-        <a
-          target="_blank"
-          rel="noopener"
-          :href="formSettings.website.includes('https') ? formSettings.website : `https://${formSettings.website}`"
-        >{{
-          formSettings.website
-        }}</a>
-      </div>
+      <CvPreviewSocialLinks />
     </div>
   </section>
 </template>

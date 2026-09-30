@@ -1,24 +1,33 @@
 <script setup lang="ts">
 import { SectionNameList } from '~/types/cvfy'
 import { useCvState } from '~/data/useCvState'
+import { cvTemplates } from '~/data/cv-templates'
+import { cvFonts } from '~/data/cv-fonts'
 
 const {
   formSettings,
   uploadCV,
   clearForm,
   resetForm,
+  addSkillGroup,
 } = useCvState()
 const switchLocalePath = useSwitchLocalePath()
 const i18n = useI18n()
 const { downloadPdf } = usePrint()
 
 const config = {
-  layouts: ['one-column', 'two-column'],
   colors: [
-    { name: 'pink', color: '#9D174D', darker: '#831843' },
-    { name: 'purple', color: '#5B21B6', darker: '#4C1D95' },
+    { name: 'indigo', color: '#4F46E5', darker: '#4338CA' },
+    { name: 'violet', color: '#7C3AED', darker: '#6D28D9' },
+    { name: 'sky', color: '#0284C7', darker: '#0369A1' },
+    { name: 'teal', color: '#0D9488', darker: '#0F766E' },
+    { name: 'rose', color: '#BE123C', darker: '#9F1239' },
+    { name: 'amber', color: '#B45309', darker: '#92400E' },
+    { name: 'slate', color: '#334155', darker: '#1E293B' },
     { name: 'blue', color: '#1E40AF', darker: '#1E3A8A' },
     { name: 'green', color: '#065F46', darker: '#064E3B' },
+    { name: 'purple', color: '#5B21B6', darker: '#4C1D95' },
+    { name: 'pink', color: '#9D174D', darker: '#831843' },
     { name: 'black', color: '#1F2937', darker: '#111827' },
   ],
   languages: [
@@ -70,27 +79,18 @@ function getCurrentColor(colorValue: string): {
     || config.colors[1]
   )
 }
+
+// Apply the stored accent color on load, otherwise the CSS default is used.
+onMounted(() => {
+  const currentColor = getCurrentColor(formSettings.value.activeColor)
+  changeColor(currentColor.color, currentColor.darker)
+})
 </script>
 
 <template>
   <div class="settings">
     <div class="flex justify-between items-center title pt-2 px-6">
       <LandingLogo />
-      <a
-        class="buy-me-a-coffee"
-        href="https://ko-fi.com/X8X4COWK0"
-        target="_blank"
-        rel="noopener noreferrer"
-        aria-label="Buy me a coffee"
-      >
-        <img
-          class="buy-me-a-coffee__image"
-          src="https://cdn.ko-fi.com/cdn/kofi5.png?v=3"
-          width="118px"
-          height="30px"
-          alt="Buy me a coffee button"
-        >
-      </a>
     </div>
     <h2 class="flex flex-wrap text-xl/normal pt-10 px-6 tracking-wide uppercase">
       <span class="title__text">
@@ -144,21 +144,21 @@ function getCurrentColor(colorValue: string): {
         </legend>
         <div class="flex flex-wrap gap-2 justify-start">
           <label
-            v-for="layout in config.layouts"
-            :key="layout"
+            v-for="cvTemplate in cvTemplates"
+            :key="cvTemplate.id"
             tabindex="0"
             class="form__btn form__btn--ghost capitalize"
             :class="[
               {
                 'form__btn--active':
-                  layout === formSettings.layout,
+                  cvTemplate.id === formSettings.layout,
               },
             ]"
           >
-            {{ $t(layout) }}
+            {{ $t(cvTemplate.id) }}
             <input
               v-model="formSettings.layout"
-              :value="layout"
+              :value="cvTemplate.id"
               type="radio"
               class="sr-only"
             >
@@ -199,6 +199,46 @@ function getCurrentColor(colorValue: string): {
         </div>
       </fieldset>
       <!-- COLOR THEME -->
+
+      <!-- FONT -->
+      <fieldset class="form__section px-6 py-3">
+        <legend class="form__legend">
+          {{ $t("font-theme") }}
+        </legend>
+        <div class="flex flex-wrap gap-2 justify-start">
+          <label
+            v-for="font in cvFonts"
+            :key="font.id"
+            tabindex="0"
+            class="form__btn form__btn--ghost"
+            :class="[
+              font.class,
+              {
+                'form__btn--active':
+                  font.id === formSettings.fontFamily,
+              },
+            ]"
+          >
+            {{ $t(`font-${font.id}`) }}
+            <input
+              v-model="formSettings.fontFamily"
+              :value="font.id"
+              type="radio"
+              class="sr-only"
+            >
+          </label>
+        </div>
+      </fieldset>
+      <!-- FONT -->
+
+      <!-- SECTION ORDER -->
+      <fieldset class="form__section px-6 py-3">
+        <legend class="form__legend">
+          {{ $t("section-order") }}
+        </legend>
+        <CvSectionOrder />
+      </fieldset>
+      <!-- SECTION ORDER -->
 
       <!-- PERSONAL DETAILS -->
       <fieldset class="form__section">
@@ -318,30 +358,18 @@ function getCurrentColor(colorValue: string): {
           </template>
           <template #content>
             <div>
-              <CvInputTags
-                v-model="formSettings.jobSkills"
-                tag-list-name="jobSkills"
-                :tag-list-label="`🛠 ${$t('technical-skills')}`"
-                :display="Boolean(formSettings.displayJobSkills)"
+              <CvSkillGroupEditor
+                v-for="group in (formSettings.skillGroups || [])"
+                :key="group.id"
+                :group="group"
               />
-              <CvInputTags
-                v-model="formSettings.softSkills"
-                tag-list-name="softSkills"
-                :tag-list-label="`🧸 ${$t('soft-skills')}`"
-                :display="Boolean(formSettings.displaySoftSkills)"
-              />
-              <CvInputTags
-                v-model="formSettings.languages"
-                tag-list-name="languages"
-                :tag-list-label="`🌎 ${$t('languages')}`"
-                :display="Boolean(formSettings.displayLanguages)"
-              />
-              <CvInputTags
-                v-model="formSettings.interests"
-                tag-list-name="interests"
-                :tag-list-label="`🧸 ${$t('interests')}`"
-                :display="Boolean(formSettings.displayInterests)"
-              />
+              <button
+                class="form__btn"
+                type="button"
+                @click="addSkillGroup"
+              >
+                {{ $t("add-skill-group") }}
+              </button>
             </div>
           </template>
         </expansion-panel>
@@ -359,10 +387,24 @@ function getCurrentColor(colorValue: string): {
           <template #content>
             <div>
               <CvDisplayCheckbox
-                class="form__display-checkbox mb-10"
+                class="form__display-checkbox mb-3"
                 :display-section="formSettings.displaySocial"
                 section-name="social"
               />
+              <!-- Sub-option of the toggle above: indented, same checkbox styling. -->
+              <div
+                v-if="formSettings.displaySocial"
+                class="form__display-checkbox checkbox mb-10 pl-5"
+              >
+                <label class="checkbox__label">
+                  <input
+                    v-model="formSettings.displaySocialInHeader"
+                    class="checkbox__input mr-2"
+                    type="checkbox"
+                  >
+                  <span class="checkbox__text">{{ $t("social-in-header") }}</span>
+                </label>
+              </div>
               <div class="grid grid-cols-2 gap-x-3 gap-y-10">
                 <div class="form__group col-span-full">
                   <label
@@ -485,7 +527,14 @@ function getCurrentColor(colorValue: string): {
 
 <style lang="postcss" scoped>
 .settings {
-  @apply bg-slate-50 bg-opacity-100 shadow-lg font-bold z-10;
+  /*
+   * `relative` makes this panel the containing block for the sr-only radio
+   * inputs (`position: absolute`, no offsets). Otherwise their containing block
+   * is the initial containing block, they escape this panel's `overflow-y-auto`
+   * clipping, stretch the document and make the whole page scroll — and the
+   * browser then scrolls the document to the focused radio on font switch.
+   */
+  @apply bg-slate-50 bg-opacity-100 shadow-lg font-bold z-10 relative;
 
   @media screen and (min-width: 1024px) {
     & {
@@ -497,16 +546,6 @@ function getCurrentColor(colorValue: string): {
     display: none;
     box-shadow: none;
     z-index: 0;
-  }
-}
-
-.buy-me-a-coffee {
-  flex-shrink: 1;
-
-  &__image {
-    width: 118px;
-    height: 30px;
-    font-size: 0.5rem;
   }
 }
 </style>

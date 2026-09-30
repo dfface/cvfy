@@ -61,6 +61,9 @@ const phoneNumberHref = computed(() => {
         </svg>
         <span tabindex="0">{{ formSettings.location }}</span>
       </div>
+      <CvPreviewSocialLinks
+        v-if="formSettings.displaySocial && formSettings.displaySocialInHeader"
+      />
     </div>
   </section>
 </template>

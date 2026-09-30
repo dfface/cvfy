@@ -1,7 +1,12 @@
 <script lang="ts" setup>
 import { useCvState } from '~/data/useCvState'
+import { getCvTemplate } from '~/data/cv-templates'
+import { getCvFont } from '~/data/cv-fonts'
 
 const { formSettings, isLoading } = useCvState()
+
+const cvTemplate = computed(() => getCvTemplate(formSettings.value.layout))
+const cvFont = computed(() => getCvFont(formSettings.value.fontFamily))
 </script>
 
 <template>
@@ -21,38 +26,17 @@ const { formSettings, isLoading } = useCvState()
     items-center
     "
   >
-    <div style="min-height: var(--height);">
+    <div>
       <div
         tabindex="0"
         aria-label="CV preview"
         class="cv shadow-lg mt-6 bg-white relative"
-        :class="[
-          { blur: isLoading },
-          formSettings.layout === 'one-column' && 'p-10 flex flex-col gap-3',
-          formSettings.layout === 'two-column' && 'grid grid-cols-3',
-        ]"
+        :class="[{ blur: isLoading }, cvTemplate.wrapperClass, cvFont.class]"
       >
-        <template v-if="formSettings.layout === 'one-column'">
-          <CvPreviewOneColumn />
-        </template>
-
-        <template v-if="formSettings.layout === 'two-column'">
-          <CvPreviewTwoColumn />
-        </template>
+        <component :is="cvTemplate.component" />
       </div>
     </div>
 
-    <div class="credit">
-      Made with ♥️ by
-      <a
-        class="underline"
-        :style="{ color: 'var(--primary)' }"
-        href="https://github.com/claudiabdm"
-        rel="noopener"
-        target="_blank"
-      >claudiabdm</a>
-      using <b>Nuxt.js</b> + <b>TailwindCSS</b>
-    </div>
   </div>
 </template>
 
@@ -61,30 +45,30 @@ p {
   @apply leading-normal;
 }
 
-.credit {
-  @apply p-3 text-slate-700 text-center w-full text-xs/normal;
-}
-
 .cvWrapper {
   @media print {
     position: unset;
     margin: 0;
     padding: 0;
+    /* The on-screen container is a scroll area; printing it would clip content. */
+    overflow: visible;
 
     & .cv {
       width: auto;
       height: auto;
       min-width: auto;
-      min-height: var(--height);
+      /* Let the content define the height: a forced A4 min-height plus the
+         page margin overflows onto a blank second page. */
+      min-height: auto;
       margin: 0;
       border: none;
       padding: 0;
-      transform: none;
+      /* Reset the on-screen preview zoom. */
+      zoom: 1;
       box-shadow: none;
-    }
-
-    & .credit {
-      display: none;
+      /* Force colored backgrounds (badges, tags, accent bars) to be printed. */
+      print-color-adjust: exact;
+      -webkit-print-color-adjust: exact;
     }
   }
 }
@@ -96,20 +80,25 @@ p {
   max-width: 21cm;
   min-height: var(--height);
   word-break: break-word;
-  transform: scale(0.4);
-  transform-origin: center top;
+  /*
+   * `zoom` instead of `transform: scale()` on purpose: a transform only scales
+   * the painting, so the A4-sized layout box stays reserved inside the scroll
+   * wrapper and leaves a blank gap below the preview. That gap grew whenever a
+   * font change altered the content height. `zoom` scales the layout box too,
+   * so no blank space is left behind.
+   */
+  zoom: 0.4;
 
   @media screen and (min-width: 425px) {
-    transform: scale(0.45);
+    zoom: 0.45;
   }
 
   @media screen and (min-width: 768px) {
-    transform: scale(0.8);
+    zoom: 0.8;
   }
 
   @media screen and (min-width: 1024px) {
-    transform: scale(0.7);
-    transform-origin: top;
+    zoom: 0.7;
   }
 
   &__pages {

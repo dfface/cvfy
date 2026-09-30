@@ -9,6 +9,19 @@ export default function useDrag(
   const dragId = ref<string>()
   const overId = ref<string>()
 
+  /**
+   * Resolves a list item id from a drag event target. The target is often a
+   * child of the draggable item (a label, an icon), so walk up to the closest
+   * ancestor that carries a known id instead of trusting the target directly.
+   */
+  function resolveId(target: EventTarget | null): string | undefined {
+    const el = target as HTMLElement | null
+    if (!el || typeof el.closest !== 'function')
+      return undefined
+    const id = (el.closest('[id]') as HTMLElement | null)?.id
+    return id && idlist.value.includes(id) ? id : undefined
+  }
+
   onMounted(() => {
     containerEl.value?.addEventListener('dragstart', handleDragStart)
     containerEl.value?.addEventListener('dragend', handleDragEnd)
@@ -26,7 +39,7 @@ export default function useDrag(
   })
 
   function handleDragStart(e: DragEvent) {
-    const id = (e.target as HTMLElement).id;
+    const id = resolveId(e.target);
     (e.target as HTMLElement).style.opacity = '0.2'
 
     if (id)
@@ -46,7 +59,7 @@ export default function useDrag(
     if (e.preventDefault)
       e.preventDefault()
 
-    const id = (e.target as HTMLElement)?.id
+    const id = resolveId(e.target)
 
     if (id && dragId.value && id !== dragId.value) {
       overId.value = id

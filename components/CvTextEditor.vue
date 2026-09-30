@@ -65,6 +65,17 @@ watch(
 .tiptap {
   font-weight: 300;
   line-height: 1.5;
+
+  /*
+   * Tailwind's preflight sets `b, strong { font-weight: bolder }`. Against our
+   * light 300 body text that relative keyword resolves to just 400, so bold was
+   * almost indistinguishable. Pin an absolute bold weight instead.
+   */
+  b,
+  strong {
+    font-weight: 700;
+  }
+
   ul,
   ol {
     @apply pl-4;
