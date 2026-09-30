@@ -13,7 +13,8 @@ permissions:
 
 jobs:
   deploy-preview:
-    runs-on: ubuntu-latest
+    # Keep on 22.04 to match build-preview.yml / gh-pages.yml toolchain.
+    runs-on: ubuntu-22.04
     if: ${{ github.event.workflow_run.conclusion == 'success' }}
     name: Deploy Preview to Cloudflare Pages
     steps:

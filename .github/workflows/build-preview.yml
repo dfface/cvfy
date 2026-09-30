@@ -10,16 +10,20 @@ concurrency:
 
 jobs:
   build-preview:
-    runs-on: ubuntu-latest
+    # Pinned to 22.04 on purpose: ubuntu-latest is now 24.04 (glibc 2.39), which
+    # triggers `munmap_chunk(): invalid pointer` / SIGABRT crashes in the native
+    # modules used during prerendering (sharp / PWA asset generation). 22.04
+    # avoids that toolchain mismatch. Keep in sync with gh-pages.yml.
+    runs-on: ubuntu-22.04
     name: Build Preview Site and Upload Build Artifact
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: Set up Node.js
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v5
         with:
-          node-version: 20.17.0
+          node-version: 24
           cache: npm
 
       - name: Install dependencies
@@ -27,6 +31,9 @@ jobs:
 
       - name: Build dist folder
         run: npm run generate
+        env:
+          # Give the prerenderer more headroom so native allocations don't fail.
+          NODE_OPTIONS: --max-old-space-size=4096
 
       # Uploads the build directory as a workflow artifact
       - name: Upload build artifact
