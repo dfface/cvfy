@@ -501,6 +501,15 @@ onMounted(() => {
       </fieldset>
       <!-- SOCIAL -->
 
+      <!-- HISTORY SECTIONS -->
+      <CvSettingsHistorySection
+        v-for="(value, key) in SectionNameList"
+        :key="key"
+        :section="key"
+        :name="value"
+      />
+      <!-- HISTORY SECTIONS -->
+
       <!-- SECTION TITLES -->
       <fieldset class="form__section grid gap-3">
         <expansion-panel :panel-name="$t('section-titles')">
@@ -533,15 +542,6 @@ onMounted(() => {
         </expansion-panel>
       </fieldset>
       <!-- SECTION TITLES -->
-
-      <!-- HISTORY SECTIONS -->
-      <CvSettingsHistorySection
-        v-for="(value, key) in SectionNameList"
-        :key="key"
-        :section="key"
-        :name="value"
-      />
-      <!-- HISTORY SECTIONS -->
 
       <!-- CTA -->
       <div class="form__section flex flex-col p-6 gap-3">
